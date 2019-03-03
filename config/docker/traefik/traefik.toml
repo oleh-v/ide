@@ -1,0 +1,35 @@
+debug = true
+
+logLevel = "INFO"
+defaultEntryPoints = ["https","http"]
+
+#[traefikLog]
+#  filePath = "/host/data/log/traefik.log"
+#  format   = "json"
+
+#[accessLog]
+#  filePath = "/host/data/log/traefik_access.log"
+#  format = "json"
+
+[web]
+# Port for the status page
+address = ":8080"
+
+[entryPoints]
+  [entryPoints.http]
+    address = ":80"
+    [entryPoints.http.forwardedHeaders]
+      trustedIPs = ["192.168.1.0/8"]
+  [entryPoints.https]
+    address = ":443"
+    [entryPoints.https.forwardedHeaders]
+      trustedIPs = ["192.168.1.0/8"]
+  [entryPoints.https.tls]
+
+[retry]
+
+[docker]
+endpoint = "unix:///var/run/docker.sock"
+domain = "docker.localhost"
+watch = true
+exposedbydefault = false
