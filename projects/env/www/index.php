@@ -26,7 +26,7 @@ print_r($env->projects);
 echo '<br>';
 echo '</pre>';
 ?>
-
+http://1750.ps/admin762tpgmiw/index.php?deletepromostickers
 <div class="container">
     <h2>Contextual Classes</h2>
     <p>Contextual classes can be used to color table rows or table cells. The classes that can be used are: .active, .success, .info, .warning, and .danger.</p>
@@ -42,13 +42,17 @@ echo '</pre>';
 
 
             <?php
+
             foreach ($env->projects as $key){
                 echo '<tr>';
                 echo '<td>'.$key.'</td>';
                 echo '<td>Status</td>';
-                echo '<td>Update / Stop / Delete</td>';
+                echo '<td><a href="http://env.ide/index.php?id=ex1&stackTest" class="delete btn btn-default">Test</a>Update / Stop / Delete</td>';
                 echo '</tr>';
+
             }
+
+            $env->caseSubmit();
             ?>
 
 

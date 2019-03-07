@@ -93,7 +93,7 @@ class Env
         );
     }
 
-    protected function caseSubmit()
+    public function caseSubmit()
     {
         if ($this->isSubmit('submitNewProject')) {
             echo "submitNew";
@@ -103,6 +103,8 @@ class Env
             echo "submitStop";
         } elseif ($this->isSubmit('submitStackDelete')) {
             echo "submitDelete";
+        } elseif ($this->isSubmit('stackTest')) {
+            echo "submitstackTest";
         }
 
     }
