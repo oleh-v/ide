@@ -1,0 +1,4 @@
+{
+  "templates":  "/host/config/docker/templates/*.{yml,YML}",
+  "projects": "/host/projects/*/docker-compose.yml"
+}

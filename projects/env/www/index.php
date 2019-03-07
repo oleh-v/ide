@@ -1,37 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Bootstrap Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+</head>
+<body>
+
 <?php
 echo '<h1>Hello World!</h1>';
 echo '<hr>';
-$output = shell_exec('docker stack ls');
-echo "<pre>$output</pre>";
 
-echo '<hr>';
+chdir(__DIR__);
+require_once 'autoload.php';
 
-var_dump($output);
+$config = 'config.json';
 
-echo '<hr>';
+$env = new Env($config);
 
-$a = `docker stack ls | awk '{if(NR>1)print $1}'`;
-echo "<pre>$a</pre>";
-echo '<hr>';
-$array  =   array_filter(explode("\n", $a));
-//$array  =   explode("\n", $a);
-echo "<pre>";
-print_r($array);
-echo "</pre>";
-echo '<hr>';
-
-//echo `pwd`;
-//$c = `docker stack deploy -c /host/projects/ex2/docker-compose.yml ex2`;
-//echo "<pre>$c</pre>";
-//$out = exec('docker service update ex2_env');
-//$out = `ls -l /`;
-//echo "<pre>$out</pre>";
-
-	$scriptName = "docker stack deploy -c /host/projects/ex2/docker-compose.yml ex2";
-	exec($scriptName,$out);
-	foreach($out as $key => $value)
-	{
-	    echo $key." ".$value."<br>";
-	}
-
+echo '<pre>';
+print_r($env->projects);
+echo '<br>';
+echo '</pre>';
 ?>
+
+<div class="container">
+    <h2>Contextual Classes</h2>
+    <p>Contextual classes can be used to color table rows or table cells. The classes that can be used are: .active, .success, .info, .warning, and .danger.</p>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Stack</th>
+            <th>State</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+
+
+            <?php
+            foreach ($env->projects as $key){
+                echo '<tr>';
+                echo '<td>'.$key.'</td>';
+                echo '<td>Status</td>';
+                echo '<td>Update / Stop / Delete</td>';
+                echo '</tr>';
+            }
+            ?>
+
+
+        <tr class="success">
+            <td>Success</td>
+            <td>Doe</td>
+            <td>john@example.com</td>
+        </tr>
+        <tr class="danger">
+            <td>Danger</td>
+            <td>Moe</td>
+            <td>mary@example.com</td>
+        </tr>
+        <tr class="info">
+            <td>Info</td>
+            <td>Dooley</td>
+            <td>july@example.com</td>
+        </tr>
+        <tr class="warning">
+            <td>Warning</td>
+            <td>Refs</td>
+            <td>bo@example.com</td>
+        </tr>
+        <tr class="active">
+            <td>Active</td>
+            <td>Activeson</td>
+            <td>act@example.com</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+
+
+</body>
+</html>
