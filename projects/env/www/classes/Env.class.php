@@ -132,14 +132,15 @@ class Env
 
     public function caseSubmit()
     {
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        //if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        if ($this->isSubmit('submitNewProject')) {
 
-            if (empty($_POST["submitNewProject"])) {
+        //    if (empty($_POST["submitNewProject"])) {
                 $params['template'] = $this->getValue('template');
                 $params['project'] = $this->getValue('stack_name');
                 $this->createNewProject($params);
                 $this->redirect($this->url());
-            }
+        //    }
 
         } elseif ($this->isSubmit('submitStackStart')) {
 
