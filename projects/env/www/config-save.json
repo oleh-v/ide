@@ -1,8 +1,4 @@
 {
-  "templates": {
-    "path": "/host/config/docker/templates/*.{yml,YML}"
-  },
-  "projects": {
-    "path": "/host/projects/*/docker-compose.yml"
-  }
+  "templates":  "/host/config/docker/templates/*.{yml,YML}",
+  "projects": "/host/projects/*/docker-compose.yml"
 }

@@ -9,78 +9,73 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
 </head>
 <body>
-
 <?php
-echo '<h1>Hello World!</h1>';
-echo '<hr>';
-
+//echo '<h1>Hello World!</h1>';
+//echo '<hr>';
 chdir(__DIR__);
 require_once 'autoload.php';
-
 $config = 'config.json';
-
 $env = new Env($config);
-
-echo '<pre>';
-print_r($env->projects);
-echo '<br>';
-echo '</pre>';
+//echo '<pre>';
+//print_r($_POST);
+//echo '</pre>';
 ?>
-http://1750.ps/admin762tpgmiw/index.php?deletepromostickers
 <div class="container">
     <h2>Contextual Classes</h2>
     <p>Contextual classes can be used to color table rows or table cells. The classes that can be used are: .active, .success, .info, .warning, and .danger.</p>
+    <form action="/index.php" method="POST">
     <table class="table">
         <thead>
         <tr>
-            <th>Stack</th>
+            <th>New Project Name</th>
+            <th>Template</th>
+            <th>Actiction</th>
+        </tr>
+        </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <input type="text" name="stack_name" value="" placeholder="Enter stack name" class="form-control" />
+                    </td>
+                    <td>
+                        <select name="template" class="form-control">
+                            <option value="" >Select project template</option>
+                            <?php foreach ($env->templates as $key){ ?>
+                                <option value="<?php echo $key; ?>" ><?php echo $key; ?></option>
+                            <?php } ?>
+                        </select>
+                    </td>
+                    <td>
+                        <button type="submit" name="submitNewProject" class="btn btn-success">Deploy</button>
+                    </td>
+                </tr>
+            </tbody>
+
+    </table>
+    </form>
+    <h4>Contextual Classes</h4>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Stack Name</th>
             <th>State</th>
             <th>Actions</th>
         </tr>
         </thead>
         <tbody>
-
-
-            <?php
-
-            foreach ($env->projects as $key){
-                echo '<tr>';
-                echo '<td>'.$key.'</td>';
-                echo '<td>Status</td>';
-                echo '<td><a href="http://env.ide/index.php?id=ex1&stackTest" class="delete btn btn-default">Test</a>Update / Stop / Delete</td>';
-                echo '</tr>';
-
-            }
-
-            $env->caseSubmit();
-            ?>
-
-
-        <tr class="success">
-            <td>Success</td>
-            <td>Doe</td>
-            <td>john@example.com</td>
-        </tr>
-        <tr class="danger">
-            <td>Danger</td>
-            <td>Moe</td>
-            <td>mary@example.com</td>
-        </tr>
-        <tr class="info">
-            <td>Info</td>
-            <td>Dooley</td>
-            <td>july@example.com</td>
-        </tr>
-        <tr class="warning">
-            <td>Warning</td>
-            <td>Refs</td>
-            <td>bo@example.com</td>
-        </tr>
-        <tr class="active">
-            <td>Active</td>
-            <td>Activeson</td>
-            <td>act@example.com</td>
-        </tr>
+            <?php foreach ($env->projects as $key){ ?>
+                <?php $state = (in_array($key, $env->stack))  ? "Runnig" : "Stopped" ; ?>
+                <tr <?php echo (in_array($key, $env->stack))  ?'class="success"' : 'class="info"' ; ?>  >
+                    <td><?php echo $key; ?></td>
+                    <td><?php echo $state; ?></td>
+                    <td>
+                        <a href="http://env.ide/index.php?stack_name=<?php echo $key; ?>&submitStackStart" class="btn btn-primary">Start / Update</a>
+                        <a href="http://env.ide/index.php?stack_name=<?php echo $key; ?>&submitStackStop" class="btn btn-warning">Stop</a>
+                        <a href="http://env.ide/index.php?stack_name=<?php echo $key; ?>&submitStackDelete" class="btn btn-danger">Delete</a>
+                    </td>
+                </tr>
+            <?php } ?>
+            <?php $env->caseSubmit(); ?>
         </tbody>
     </table>
 </div>

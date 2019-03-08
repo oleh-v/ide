@@ -39,7 +39,7 @@ services:
 
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.6.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.6.1
     hostname: elasticsearch
     deploy:
       restart_policy:
@@ -75,7 +75,7 @@ services:
 
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:6.6.0
+    image: docker.elastic.co/kibana/kibana:6.6.1
     hostname: kibana
 #    ports:
 #      - '5601:5601'
@@ -111,7 +111,7 @@ services:
 
 
   logstash:
-    image: docker.elastic.co/logstash/logstash:6.6.0
+    image: docker.elastic.co/logstash/logstash:6.6.1
     hostname: logstash
 #    ports:
 #      - '5044:5044'
@@ -138,7 +138,7 @@ services:
   filebeat:
     user: root
     hostname: filebeat
-    image: docker.elastic.co/beats/filebeat:6.6.0
+    image: docker.elastic.co/beats/filebeat:6.6.1
     depends_on:
       - 'elasticsearch'
     deploy:
