@@ -1,5 +1,5 @@
 FROM mysql:5.7
 
-COPY config/mysql/utf8mb4.cnf /etc/mysql/conf.d/
+COPY utf8mb4.cnf /etc/mysql/conf.d/
 
 RUN chmod 0444 /etc/mysql/conf.d/utf8mb4.cnf

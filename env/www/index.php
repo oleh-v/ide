@@ -17,7 +17,7 @@ require_once 'autoload.php';
 $config = 'config.json';
 $env = new Env($config);
 //echo '<pre>';
-//print_r($_POST);
+//print_r($_SERVER);
 //echo '</pre>';
 ?>
 <div class="container">
@@ -41,7 +41,7 @@ $env = new Env($config);
                         <select name="template" class="form-control">
                             <option value="" >Select project template</option>
                             <?php foreach ($env->templates as $key){ ?>
-                                <option value="<?php echo $key; ?>" ><?php echo $key; ?></option>
+                                <option value="<?php echo $key; ?>" ><?php echo pathinfo($key, PATHINFO_FILENAME); ?></option>
                             <?php } ?>
                         </select>
                     </td>
@@ -58,6 +58,7 @@ $env = new Env($config);
         <thead>
         <tr>
             <th>Stack Name</th>
+            <th>URL</th>
             <th>State</th>
             <th>Actions</th>
         </tr>
@@ -67,11 +68,12 @@ $env = new Env($config);
                 <?php $state = (in_array($key, $env->stack))  ? "Runnig" : "Stopped" ; ?>
                 <tr <?php echo (in_array($key, $env->stack))  ?'class="success"' : 'class="info"' ; ?>  >
                     <td><?php echo $key; ?></td>
+                    <td><a href="<?php echo $_SERVER['REQUEST_SCHEME'].':'.DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR.$key.'.'.$env->hostname; ?>" target="_blank"><?php echo $_SERVER['REQUEST_SCHEME'].':'.DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR.$key.'.'.$env->hostname; ?></td>
                     <td><?php echo $state; ?></td>
                     <td>
-                        <a href="http://env.ide/index.php?stack_name=<?php echo $key; ?>&submitStackStart" class="btn btn-primary">Start / Update</a>
-                        <a href="http://env.ide/index.php?stack_name=<?php echo $key; ?>&submitStackStop" class="btn btn-warning">Stop</a>
-                        <a href="http://env.ide/index.php?stack_name=<?php echo $key; ?>&submitStackDelete" class="btn btn-danger">Delete</a>
+                        <a href="<?php echo $_SERVER['REQUEST_SCHEME'].':'.DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR.$_SERVER['SERVER_NAME'].DIRECTORY_SEPARATOR ; ?>index.php?stack_name=<?php echo $key; ?>&submitStackStart" class="btn btn-primary">Start / Update</a>
+                        <a href="<?php echo $_SERVER['REQUEST_SCHEME'].':'.DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR.$_SERVER['SERVER_NAME'].DIRECTORY_SEPARATOR ; ?>index.php?stack_name=<?php echo $key; ?>&submitStackStop" class="btn btn-warning">Stop</a>
+                        <a href="<?php echo $_SERVER['REQUEST_SCHEME'].':'.DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR.$_SERVER['SERVER_NAME'].DIRECTORY_SEPARATOR ; ?>index.php?stack_name=<?php echo $key; ?>&submitStackDelete" class="btn btn-danger">Delete</a>
                     </td>
                 </tr>
             <?php } ?>

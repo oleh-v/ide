@@ -2,11 +2,15 @@
 
 class Env
 {
+    public $dir;
+
     public $dir_templates;
 
     public $dir_projects;
 
     public $stack;
+
+    public $hostname;
 
     protected $mysql;
 
@@ -27,9 +31,13 @@ class Env
     {
         $config = json_decode(file_get_contents($params), true);
 
+        $this->dir = $config['documentRoot'];
+
         $this->dir_templates = $config['documentRoot'].DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'docker'.DIRECTORY_SEPARATOR.'templates';
 
         $this->dir_projects = $config['documentRoot'].DIRECTORY_SEPARATOR.'projects';
+
+        $this->hostname = str_replace('env.', '', $_SERVER['SERVER_NAME']);
     }
 
     public function getStacks()
@@ -65,13 +73,21 @@ class Env
 
     public function createNewProject($params)
     {
-        $dir_project = $this->dir_projects . DIRECTORY_SEPARATOR . $params['project'];
+        $stack_name =  $params['project'] . '-' . pathinfo($params['template'], PATHINFO_FILENAME);
+        $dir_project = $this->dir_projects . DIRECTORY_SEPARATOR . $stack_name;
         $dir_www = $dir_project . DIRECTORY_SEPARATOR . 'www';
         `mkdir -m 777 -p $dir_project`;
         `mkdir -m 777 -p $dir_www`;
-        copy($this->dir_templates . DIRECTORY_SEPARATOR . $params['template'], $dir_project. DIRECTORY_SEPARATOR . 'docker-compose.yml');
-        $this->mysql->query("CREATE DATABASE $params");
-        $this->stackStart($params['project']);
+
+        $template = $this->dir_templates . DIRECTORY_SEPARATOR . $params['template'];
+        $file = $dir_project. DIRECTORY_SEPARATOR . 'docker-compose.yml';
+
+        file_put_contents($file, str_replace(array('{{stack_name}}','{{hostname}}'), array($stack_name, $this->hostname), file_get_contents($template)));
+
+        file_put_contents($dir_www.DIRECTORY_SEPARATOR.'index.html', str_replace(array('{{stack_name}}','{{hostname}}'), array($stack_name, $this->hostname), file_get_contents($this->dir.DIRECTORY_SEPARATOR.'index.html')));
+
+        $this->mysql->query("CREATE DATABASE `$stack_name`");
+        $this->stackStart($stack_name);
 
     }
 
@@ -92,7 +108,7 @@ class Env
         $this->stackStop($params);
         $project_path = $this->dir_projects . DIRECTORY_SEPARATOR . $params;
         `rm -rf $project_path`;
-        $this->mysql->query("DROP DATABASE $params");
+        $this->mysql->query("DROP DATABASE `$params`");
     }
 
     public static function isSubmit($submit)
@@ -132,15 +148,12 @@ class Env
 
     public function caseSubmit()
     {
-        //if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($this->isSubmit('submitNewProject')) {
 
-        //    if (empty($_POST["submitNewProject"])) {
-                $params['template'] = $this->getValue('template');
-                $params['project'] = $this->getValue('stack_name');
-                $this->createNewProject($params);
-                $this->redirect($this->url());
-        //    }
+            $params['template'] = $this->getValue('template');
+            $params['project'] = $this->getValue('stack_name');
+            $this->createNewProject($params);
+            $this->redirect($this->url());
 
         } elseif ($this->isSubmit('submitStackStart')) {
 
@@ -159,6 +172,7 @@ class Env
             $stack_name = $this->getValue('stack_name');
             $this->stackDelete($stack_name);
             $this->redirect($this->url());
+
         }
     }
 
