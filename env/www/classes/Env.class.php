@@ -33,7 +33,7 @@ class Env
 
         $this->dir = $config['documentRoot'];
 
-        $this->dir_templates = $config['documentRoot'].DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'docker'.DIRECTORY_SEPARATOR.'templates';
+        $this->dir_templates = $config['documentRoot'].DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'templates';
 
         $this->dir_projects = $config['documentRoot'].DIRECTORY_SEPARATOR.'projects';
 
@@ -84,7 +84,7 @@ class Env
 
         file_put_contents($file, str_replace(array('{{stack_name}}','{{hostname}}'), array($stack_name, $this->hostname), file_get_contents($template)));
 
-        file_put_contents($dir_www.DIRECTORY_SEPARATOR.'index.html', str_replace(array('{{stack_name}}','{{hostname}}'), array($stack_name, $this->hostname), file_get_contents($this->dir.DIRECTORY_SEPARATOR.'index.html')));
+        file_put_contents($dir_www.DIRECTORY_SEPARATOR.'index.html', str_replace(array('{{stack_name}}','{{hostname}}'), array($stack_name, $this->hostname), file_get_contents($this->dir.DIRECTORY_SEPARATOR.'env'.DIRECTORY_SEPARATOR.'index.html')));
 
         $this->mysql->query("CREATE DATABASE `$stack_name`");
         $this->stackStart($stack_name);

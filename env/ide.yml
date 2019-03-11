@@ -313,7 +313,7 @@ services:
       - ../../env/www:/var/www/html
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/bin/docker:/usr/bin/docker
-      - /host:/host
+      - {{envpwd}}:{{envpwd}}
     networks:
       - traefik
       - mysql

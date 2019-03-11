@@ -19,11 +19,14 @@ fi
 chown root:root ./config/docker/filebeat/filebeat.yml
 chmod 644 ./config/docker/filebeat/filebeat.yml
 chmod -R 775 ./data/elk/elastic/es_data
+chown root:docker projects
+chmod 775 projects
 
 docker build -t mysql_ide ./config/docker/mysql
 docker build -t php_ide ./config/docker/php --build-arg docker_gid=$(getent group docker | awk -F ":" '{print $3}')
 
-cp ide.yml config/docker/ide.yml
+cp env/ide.yml config/docker/ide.yml
 sed -i "s/{{hostname}}/$HOSTNAME/g" config/docker/ide.yml
+sed -i "s?{{envpwd}}?$PWD?g" config/docker/ide.yml
 
 docker stack deploy -c ./config/docker/ide.yml ide
