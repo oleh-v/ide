@@ -17,17 +17,18 @@ require_once 'autoload.php';
 $config = 'config.json';
 $env = new Env($config);
 //echo '<pre>';
-//print_r($_SERVER);
+//print_r($env->dir_templates);
 //echo '</pre>';
 ?>
 <div class="container">
-    <h2>Contextual Classes</h2>
-    <p>Contextual classes can be used to color table rows or table cells. The classes that can be used are: .active, .success, .info, .warning, and .danger.</p>
+    <h2>Integrated Development Environment</h2>
+    <br>
+    <h4>Create new project</h4>
     <form action="/index.php" method="POST">
     <table class="table">
         <thead>
         <tr>
-            <th>New Project Name</th>
+            <th>Project Name</th>
             <th>Template</th>
             <th>Actiction</th>
         </tr>
@@ -53,7 +54,8 @@ $env = new Env($config);
 
     </table>
     </form>
-    <h4>Contextual Classes</h4>
+    <br>
+    <h4>Existing projects list</h4>
     <table class="table">
         <thead>
         <tr>

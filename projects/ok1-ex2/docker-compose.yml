@@ -1,0 +1,36 @@
+version: "3.5"
+services:
+  ok1-ex2:
+    image: php:7.3.2-apache-stretch
+    hostname: ok1-ex2
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == manager]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=ok1-ex2"
+      - "traefik.frontend.rule=Host: ok1-ex2.aleh.ide"
+      - "traefik.port=80"
+      - "traefik.docker.network=traefik_net"
+      - "traefik.frontend.entryPoints=http"
+      - "stackname=ok1-ex2"
+      - "filebeat_enable=true"
+    volumes:
+#      - ./conf/php/php.ini:/usr/local/etc/php/conf.d/user.ini
+      - ./www:/var/www/html
+    networks:
+      - traefik
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10M"
+        max-file: "1"
+
+networks:
+  traefik:
+    external: true
+    name: traefik_net
+

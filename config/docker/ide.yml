@@ -98,7 +98,7 @@ services:
       - "traefik.port=5601"
       - "traefik.docker.network=traefik_net"
       - "traefik.backend=kibana"
-      - "traefik.frontend.rule=Host: elk.test"
+      - "traefik.frontend.rule=Host: elk.aleh.ide"
 #      - "traefik.frontend.entryPoints=http"
     networks:
       - ide
@@ -184,7 +184,7 @@ services:
       - "traefik.port=80"
       - "traefik.docker.network=traefik_net"
       - "traefik.backend=phpmyadmin"
-      - "traefik.frontend.rule=Host: pma.test"
+      - "traefik.frontend.rule=Host: pma.aleh.ide"
       - "traefik.frontend.entryPoints=http"
     networks:
       - ide
@@ -288,7 +288,7 @@ services:
 
   env:
     image: php_ide
-    hostname: env.test
+    hostname: env.aleh.ide
     user: root
     deploy:
       replicas: 1
@@ -299,7 +299,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.backend=env"
-      - "traefik.frontend.rule=Host: env.test"
+      - "traefik.frontend.rule=Host: env.aleh.ide"
       - "traefik.port=80"
       - "traefik.docker.network=traefik_net"
       - "traefik.frontend.entryPoints=http"
@@ -313,7 +313,7 @@ services:
       - ../../env/www:/var/www/html
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/bin/docker:/usr/bin/docker
-      - /env/dev-env:/env/dev-env
+      - /ts/dev-env:/ts/dev-env
     networks:
       - traefik
       - mysql

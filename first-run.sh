@@ -29,4 +29,7 @@ cp env/ide.yml config/docker/ide.yml
 sed -i "s/{{hostname}}/$HOSTNAME/g" config/docker/ide.yml
 sed -i "s?{{envpwd}}?$PWD?g" config/docker/ide.yml
 
+cp env/config.json env/www/config.json
+sed -i "s?{{envpwd}}?$PWD?g" env/www/config.json
+
 docker stack deploy -c ./config/docker/ide.yml ide
