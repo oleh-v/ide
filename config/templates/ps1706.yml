@@ -1,7 +1,7 @@
 version: "3.5"
 services:
   {{stack_name}}:
-    image: prestashop/prestashop:1.7.1.2
+    image: prestashop/prestashop:1.7.0.6
     hostname: {{stack_name}}
     deploy:
       replicas: 1
