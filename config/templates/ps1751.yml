@@ -1,0 +1,46 @@
+version: "3.5"
+services:
+  {{stack_name}}:
+    image: prestashop/prestashop:1.7.5.1
+    hostname: {{stack_name}}
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == manager]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend={{stack_name}}"
+      - "traefik.frontend.rule=Host: {{stack_name}}.{{hostname}}"
+      - "traefik.port=80"
+      - "traefik.docker.network=traefik_net"
+      - "traefik.frontend.entryPoints=http"
+      - "stackname={{stack_name}}"
+      - "filebeat_enable=true"
+    volumes:
+      - ../../config/docker/php/php.ini:/usr/local/etc/php/conf.d/user.ini
+      - ./www:/var/www/html
+    environment:
+      - PS_DEV_MODE=0
+      - DB_SERVER=mysql
+      - DB_USER=root
+      - DB_PASSWD=
+      - DB_NAME={{stack_name}}
+      - PS_INSTALL_AUTO=0
+    networks:
+      - traefik
+      - mysql
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10M"
+        max-file: "1"
+
+networks:
+  traefik:
+    external: true
+    name: traefik_net
+  mysql:
+    external: true
+    name: mysql_net

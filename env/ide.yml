@@ -309,7 +309,7 @@ services:
 #      - APACHE_RUN_USER=root
 #      - PHP_CFLAGS=-DBIG_SECURITY_HOLE
     volumes:
-#      - ./conf/php/php.ini:/usr/local/etc/php/conf.d/user.ini
+      - ./php/php.ini:/usr/local/etc/php/conf.d/user.ini
       - ../../env/www:/var/www/html
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/bin/docker:/usr/bin/docker

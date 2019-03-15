@@ -1,7 +1,7 @@
 version: "3.5"
 services:
   {{stack_name}}:
-    image: prestashop/prestashop:1.7.4.2
+    image: prestashop/prestashop:1.7.3.4
     hostname: {{stack_name}}
     deploy:
       replicas: 1
@@ -19,7 +19,7 @@ services:
       - "stackname={{stack_name}}"
       - "filebeat_enable=true"
     volumes:
-#      - ./conf/php/php.ini:/usr/local/etc/php/conf.d/user.ini
+      - ../../config/docker/php/php.ini:/usr/local/etc/php/conf.d/user.ini
       - ./www:/var/www/html
     environment:
       - PS_DEV_MODE=0

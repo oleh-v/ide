@@ -7,6 +7,26 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+
+    <style>
+        .navbar .nav {
+            margin: 0;
+            display: flex;
+            flex-direction: row;
+            width: 85%;
+        }
+
+        .navbar .nav li {
+            flex: 1;
+        }
+
+        .navbar .nav li a {
+            font-weight: bold;
+            text-align: center;
+            flex: 1;
+        }
+    </style>
+
 </head>
 <body>
 <?php
@@ -17,10 +37,19 @@ require_once 'autoload.php';
 $config = 'config.json';
 $env = new Env($config);
 //echo '<pre>';
-//print_r($env->dir_templates);
+//print_r($_SERVER);
 //echo '</pre>';
 ?>
 <div class="container">
+    <nav class="navbar navbar-default navbar-static-top">
+        <div class="container">
+            <ul class="nav navbar-nav">
+                <li><a href="<?php echo $_SERVER['REQUEST_SCHEME'].':'.DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR.$key.'elk.'.$env->hostname; ?>" target="_blank">ELK</a></li>
+                <li><a href="<?php echo $_SERVER['REQUEST_SCHEME'].':'.DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR.$key.$env->hostname; ?>:9000" target="_blank">Portainer</a></li>
+                <li><a href="<?php echo $_SERVER['REQUEST_SCHEME'].':'.DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR.$key.$env->hostname; ?>:8080" target="_blank">Traefik</a></li>
+            </ul>
+        </div>
+    </nav>
     <h2>Integrated Development Environment</h2>
     <br>
     <h4>Create new project</h4>
@@ -54,6 +83,7 @@ $env = new Env($config);
 
     </table>
     </form>
+
     <br>
     <h4>Existing projects list</h4>
     <table class="table">
