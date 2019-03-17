@@ -37,16 +37,17 @@ require_once 'autoload.php';
 $config = 'config.json';
 $env = new Env($config);
 //echo '<pre>';
-//print_r($env->getAdminDir('promo-ps1751'));
+//print_r($key);
 //echo '</pre>';
 ?>
 <div class="container">
     <nav class="navbar navbar-default navbar-static-top">
         <div class="container">
             <ul class="nav navbar-nav">
-                <li><a href="<?php echo $_SERVER['REQUEST_SCHEME'].':'.DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR.$key.'elk.'.$env->hostname; ?>" target="_blank">ELK</a></li>
-                <li><a href="<?php echo $_SERVER['REQUEST_SCHEME'].':'.DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR.$key.$env->hostname; ?>:9000" target="_blank">Portainer</a></li>
-                <li><a href="<?php echo $_SERVER['REQUEST_SCHEME'].':'.DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR.$key.$env->hostname; ?>:8080" target="_blank">Traefik</a></li>
+                <li><a href="<?php echo $_SERVER['REQUEST_SCHEME'].':'.DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR.'elk.'.$env->hostname; ?>" target="_blank">ELK</a></li>
+                <li><a href="<?php echo $_SERVER['REQUEST_SCHEME'].':'.DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR.$env->hostname; ?>:9000" target="_blank">Portainer</a></li>
+                <li><a href="<?php echo $_SERVER['REQUEST_SCHEME'].':'.DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR.$env->hostname; ?>:8080" target="_blank">Traefik</a></li>
+                <li><a href="<?php echo $_SERVER['REQUEST_SCHEME'].':'.DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR.'pma.'.$env->hostname; ?>" target="_blank">PHPMyAdmin</a></li>
             </ul>
         </div>
     </nav>
