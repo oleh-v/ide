@@ -21,6 +21,7 @@ services:
     volumes:
       - ../../config/docker/php/php.ini:/usr/local/etc/php/conf.d/user.ini
       - ./www:/var/www/html
+      - ../../code/prestashop/modules:{{dir}}/code/prestashop/modules
     environment:
       - PS_DEV_MODE=0
       - DB_SERVER=mysql

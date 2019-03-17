@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Bootstrap Example</title>
+    <title>IDE</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
@@ -37,7 +37,7 @@ require_once 'autoload.php';
 $config = 'config.json';
 $env = new Env($config);
 //echo '<pre>';
-//print_r($_SERVER);
+//print_r($env->getAdminDir('promo-ps1751'));
 //echo '</pre>';
 ?>
 <div class="container">
@@ -90,7 +90,8 @@ $env = new Env($config);
         <thead>
         <tr>
             <th>Stack Name</th>
-            <th>URL</th>
+            <th>Back URL</th>
+            <th>Front URL</th>
             <th>State</th>
             <th>Actions</th>
         </tr>
@@ -100,6 +101,7 @@ $env = new Env($config);
                 <?php $state = (in_array($key, $env->stack))  ? "Runnig" : "Stopped" ; ?>
                 <tr <?php echo (in_array($key, $env->stack))  ?'class="success"' : 'class="info"' ; ?>  >
                     <td><?php echo $key; ?></td>
+                    <td><a href="<?php echo $_SERVER['REQUEST_SCHEME'].':'.DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR.$key.'.'.$env->hostname.DIRECTORY_SEPARATOR.$env->getAdminDir($key); ?>" target="_blank"><?php echo $_SERVER['REQUEST_SCHEME'].':'.DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR.$key.'.'.$env->hostname.DIRECTORY_SEPARATOR.$env->getAdminDir($key); ?></td>
                     <td><a href="<?php echo $_SERVER['REQUEST_SCHEME'].':'.DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR.$key.'.'.$env->hostname; ?>" target="_blank"><?php echo $_SERVER['REQUEST_SCHEME'].':'.DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR.$key.'.'.$env->hostname; ?></td>
                     <td><?php echo $state; ?></td>
                     <td>

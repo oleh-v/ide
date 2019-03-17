@@ -40,5 +40,16 @@ processors:
 #                    docker.container.image: "php_http:latest"
                     docker.container.labels.filebeat_enable: "true"
 
-output.logstash:
-  hosts: ["logstash:5044"]
+#output.logstash:
+#  hosts: ["logstash:5044"]
+
+output.elasticsearch:
+  hosts: ["elasticsearch:9200"]
+  indices:
+#    - index: "access-%{[beat.version]}-%{+yyyy.MM.dd}"
+#      when.contains:
+#        stream: "stdout"
+#    - index: "error-%{[beat.version]}-%{+yyyy.MM.dd}"
+#      when.contains:
+#        stream: "stderr"
+    - index: "%{[docker.container.labels.com.docker.swarm.service.name]}"

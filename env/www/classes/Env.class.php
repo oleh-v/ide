@@ -71,24 +71,56 @@ class Env
         return $data;
     }
 
+    public function getAdminDir($params)
+    {
+        $adminDir = '';
+        if ($data = glob($this->dir_projects.DIRECTORY_SEPARATOR.$params.DIRECTORY_SEPARATOR.'www'.DIRECTORY_SEPARATOR.'*admin*', GLOB_ONLYDIR)) {
+            $adminDir = basename($data[0]);
+        }
+
+        return $adminDir;
+    }
+
+    public function getModules($params)
+    {
+        $data = array();
+        if ($projects = glob($params.DIRECTORY_SEPARATOR.'*', GLOB_ONLYDIR)) {
+            foreach ($projects as $key => $project) {
+                //$data[] = basename(dirname($project));
+                $data[] = basename($project);
+            }
+        }
+
+        return $data;
+    }
+
     public function createNewProject($params)
     {
         $stack_name =  $params['project'] . '-' . pathinfo($params['template'], PATHINFO_FILENAME);
         $dir_project = $this->dir_projects . DIRECTORY_SEPARATOR . $stack_name;
         $dir_www = $dir_project . DIRECTORY_SEPARATOR . 'www';
         `mkdir -m 777 -p $dir_project`;
-        `mkdir -m 777 -p $dir_www`;
+        `mkdir -m 777 -p $dir_www/modules`;
 
         $template = $this->dir_templates . DIRECTORY_SEPARATOR . $params['template'];
         $file = $dir_project. DIRECTORY_SEPARATOR . 'docker-compose.yml';
 
-        file_put_contents($file, str_replace(array('{{stack_name}}','{{hostname}}'), array($stack_name, $this->hostname), file_get_contents($template)));
+        file_put_contents($file, str_replace(array('{{stack_name}}','{{hostname}}','{{dir}}'), array($stack_name, $this->hostname, $this->dir), file_get_contents($template)));
 
         file_put_contents($dir_www.DIRECTORY_SEPARATOR.'index.html', str_replace(array('{{stack_name}}','{{hostname}}'), array($stack_name, $this->hostname), file_get_contents($this->dir.DIRECTORY_SEPARATOR.'env'.DIRECTORY_SEPARATOR.'index.html')));
 
+        if (substr($params['template'], 0, strlen("ps")) === "ps") {
+            $platform = "prestashop";
+            $modules = $this->getModules($this->dir.DIRECTORY_SEPARATOR.'code'.DIRECTORY_SEPARATOR.$platform.DIRECTORY_SEPARATOR.'modules');
+
+            foreach ($modules as $module) {
+                `ln -sfn $this->dir/code/$platform/modules/$module $dir_www/modules/$module`;
+            }
+
+        }
+
         $this->mysql->query("CREATE DATABASE `$stack_name`");
         $this->stackStart($stack_name);
-
     }
 
     public function stackStart($params)
