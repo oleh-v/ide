@@ -24,6 +24,7 @@ chmod 775 projects
 
 docker build -t mysql_ide ./config/docker/mysql
 docker build -t php_ide ./config/docker/php --build-arg docker_gid=$(getent group docker | awk -F ":" '{print $3}')
+docker build -t curator_ide ./config/docker/elk/curator
 
 cp env/ide.yml config/docker/ide.yml
 sed -i "s/{{hostname}}/$HOSTNAME/g" config/docker/ide.yml

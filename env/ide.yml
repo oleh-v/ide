@@ -163,6 +163,28 @@ services:
     logging:
       driver: "none"
 
+  curator:
+    image: curator_ide
+    hostname: curator
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 20s
+        max_attempts: 3
+        window: 120s
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      update_config:
+        delay: 2s
+    volumes:
+      - ./elk/curator/config.yml:/etc/curator/config.yml
+      - ./elk/curator/action.yml:/etc/curator/action.yml
+    networks:
+      - ide
+    logging:
+      driver: "none"
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -314,6 +336,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/bin/docker:/usr/bin/docker
       - {{envpwd}}:{{envpwd}}
+	  - /etc/localtime:/etc/localtime:ro
     networks:
       - traefik
       - mysql
