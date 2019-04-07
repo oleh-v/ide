@@ -22,7 +22,7 @@ services:
     deploy:
       replicas: 1
       restart_policy:
-        condition: on-failure
+        condition: any
       placement:
         constraints:
           - node.role == manager
@@ -43,7 +43,7 @@ services:
     hostname: elasticsearch
     deploy:
       restart_policy:
-        condition: on-failure
+        condition: any
         delay: 20s
         max_attempts: 5
         window: 120s
@@ -82,7 +82,7 @@ services:
     deploy:
       replicas: 1
       restart_policy:
-        condition: on-failure
+        condition: any
       placement:
         constraints:
           - node.role == manager
@@ -138,7 +138,7 @@ services:
     deploy:
       mode: global
       restart_policy:
-        condition: on-failure
+        condition: amy
       resources:
         limits:
           cpus: '0.20'
@@ -168,7 +168,7 @@ services:
     hostname: curator
     deploy:
       restart_policy:
-        condition: on-failure
+        condition: any
         delay: 20s
         max_attempts: 3
         window: 120s
@@ -192,7 +192,7 @@ services:
     deploy:
       replicas: 1
       restart_policy:
-        condition: on-failure
+        condition: any
       placement:
         constraints:
           - node.role == manager
@@ -222,7 +222,7 @@ services:
     deploy:
       replicas: 1
       restart_policy:
-        condition: on-failure
+        condition: any
       placement:
         constraints:
           - node.role == manager
@@ -244,49 +244,13 @@ services:
     logging:
       driver: "none"
 
-
-
-#  mail1:
-#    image: php_http
-#    hostname: mail1.flowers.local
-#    deploy:
-#      replicas: 1
-#      restart_policy:
-#        condition: on-failure
-#      placement:
-#        constraints: [node.role == manager]
-#      labels:
-#        - "traefik.enable=true"
-#        - "traefik.backend=mail1"
-#        - "traefik.frontend.rule=Host: mail1.flowers.local"
-#        - "traefik.port=80"
-#        - "traefik.docker.network=traefik_proxy"
-#        - "traefik.frontend.entryPoints=http"
-#        - "stackname=mail1"
-##        - "filebeat_enable=true"
-#    labels:
-#      - "filebeat_enable=true"
-##    ports:
-##     - "80:80"
-#    volumes:
-#      - ./conf/php/php.ini:/usr/local/etc/php/conf.d/user.ini
-#      - ./www:/var/www/html
-#    networks:
-#      - net
-#    logging:
-#      driver: "json-file"
-#      options:
-#        max-size: "10M"
-#        max-file: "1"
-
-
   mysql:
     image: mysql_ide
     hostname: mysql
     deploy:
       replicas: 1
       restart_policy:
-        condition: on-failure
+        condition: any
       placement:
         constraints:
           - node.role == manager
@@ -315,7 +279,7 @@ services:
     deploy:
       replicas: 1
       restart_policy:
-        condition: on-failure
+        condition: any
       placement:
         constraints: [node.role == manager]
     labels:

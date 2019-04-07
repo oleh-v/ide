@@ -52,4 +52,4 @@ output.elasticsearch:
 #    - index: "error-%{[beat.version]}-%{+yyyy.MM.dd}"
 #      when.contains:
 #        stream: "stderr"
-    - index: "%{[docker.container.labels.com.docker.swarm.service.name]}"
+    - index: "%{[docker.container.labels.com.docker.swarm.service.name]}-%{+yyyy.MM.dd}"
