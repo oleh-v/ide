@@ -138,7 +138,7 @@ services:
     deploy:
       mode: global
       restart_policy:
-        condition: amy
+        condition: any
       resources:
         limits:
           cpus: '0.20'
