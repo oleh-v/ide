@@ -24,7 +24,7 @@ class Env
         $this->stack = $this->getStacks();
         $this->templates = $this->getTemplates($this->dir_templates);
         $this->projects = $this->getProjects($this->dir_projects);
-        $this->mysql = new mysqli("mysql", "root", "");
+        $this->mysql = new mysqli("mysql", "root", "root");
     }
 
     public function getConfig($params)
@@ -94,6 +94,7 @@ class Env
         return $data;
     }
 
+/*
     public function createNewProject($params)
     {
         $stack_name =  $params['project'] . '-' . pathinfo($params['template'], PATHINFO_FILENAME);
@@ -122,6 +123,143 @@ class Env
         $this->mysql->query("CREATE DATABASE `$stack_name`");
         $this->stackStart($stack_name);
     }
+*/
+
+    public function createNewProjectPrestashop($params)
+    {
+        $platform = pathinfo($params['template'], PATHINFO_FILENAME);
+        $version = $params['version'];
+        $stack_name =  $params['project'] . '-' . pathinfo($params['template'], PATHINFO_FILENAME) . preg_replace("/[^0-9]/", '', $version);
+        $dir_project = $this->dir_projects . DIRECTORY_SEPARATOR . $stack_name;
+        $dir_www = $dir_project . DIRECTORY_SEPARATOR . 'www';
+        `mkdir -m 777 -p $dir_project`;
+        `mkdir -m 777 -p $dir_www/modules`;
+
+        $template = $this->dir_templates . DIRECTORY_SEPARATOR . $params['template'];
+        $compose = $dir_project. DIRECTORY_SEPARATOR . 'docker-compose.yml';
+        file_put_contents($compose, str_replace(array('{{stack_name}}','{{hostname}}','{{dir}}','{{platform}}', '{{version}}'), array($stack_name, $this->hostname, $this->dir, $platform, $version), file_get_contents($template)));
+
+        file_put_contents($dir_project . DIRECTORY_SEPARATOR . 'php.ini', file_get_contents($this->dir_templates . DIRECTORY_SEPARATOR . $platform . DIRECTORY_SEPARATOR . 'php.ini'));
+
+        // Dockerfile (install memcached)
+        $dockerfile = $dir_project. DIRECTORY_SEPARATOR . 'Dockerfile';
+        file_put_contents($dockerfile, str_replace(array('{{version}}'), array($version), file_get_contents($this->dir_templates . DIRECTORY_SEPARATOR . $platform . DIRECTORY_SEPARATOR . 'Dockerfile')));
+
+        `docker build -t prestashop_prestashop:$version - < $dockerfile || true`;
+
+        $modules = $this->getModules($this->dir.DIRECTORY_SEPARATOR.'code'.DIRECTORY_SEPARATOR.$platform.DIRECTORY_SEPARATOR.'modules');
+        foreach ($modules as $module) {
+            `ln -sfn $this->dir/code/$platform/modules/$module $dir_www/modules/$module`;
+        }
+
+        $this->mysql->query("CREATE DATABASE `$stack_name`");
+
+        $this->stackStart($stack_name);
+    }
+
+    public function createNewProjectOpencart($params)
+    {
+        $platform = pathinfo($params['template'], PATHINFO_FILENAME);
+        $version = $params['version'];
+        $version_number = preg_replace("/[^0-9]/", '', $version);
+        $upload_path = "/tmp/upload/*";
+        if ($version_number < 2200) {
+            $oc_url = "https://github.com/opencart/opencart/archive/" . $version . ".zip";
+            $upload_path = "/tmp/opencart-" . $version . "/upload/*";
+        } elseif ($version_number >= 2200 && $version_number <= 3011 ) {
+            $oc_url = "https://github.com/opencart/opencart/releases/download/".$version."/" . $version . "-compiled.zip";
+            if ($version_number == 2200) {
+                $upload_path = "/tmp/" . $version . "-compiled/upload/*";
+            }
+        } elseif ($version_number == 3012) {
+            $oc_url = "https://github.com/opencart/opencart/releases/download/".$version."/" . $version . "-opencart.zip";
+        } elseif ($version_number == 3020) {
+            $oc_url = "https://github.com/opencart/opencart/releases/download/".$version."/" . $version . "-OpenCart.zip";
+        } elseif ($version_number > 3020) {
+            $oc_url = "https://github.com/opencart/opencart/releases/download/".$version."/opencart-".$version.".zip";
+            $upload_path = "/tmp/upload/*";
+        }
+        $stack_name =  $params['project'] . '-' . pathinfo($params['template'], PATHINFO_FILENAME) . preg_replace("/[^0-9]/", '', $version);
+        $dir_project = $this->dir_projects . DIRECTORY_SEPARATOR . $stack_name;
+        `mkdir -m 777 -p $dir_project/www`;
+
+        $template = $this->dir_templates . DIRECTORY_SEPARATOR . $params['template'];
+        $compose = $dir_project. DIRECTORY_SEPARATOR . 'docker-compose.yml';
+        file_put_contents($compose, str_replace(array('{{stack_name}}','{{hostname}}','{{dir}}','{{platform}}', '{{version}}'), array($stack_name, $this->hostname, $this->dir, $platform, $version), file_get_contents($template)));
+
+        file_put_contents($dir_project . DIRECTORY_SEPARATOR . 'php.ini', file_get_contents($this->dir_templates . DIRECTORY_SEPARATOR . $platform . DIRECTORY_SEPARATOR . 'php.ini'));
+
+        $inittemplate = $this->dir_templates . DIRECTORY_SEPARATOR . $platform . DIRECTORY_SEPARATOR . 'init.sh';
+        $init = $dir_project. DIRECTORY_SEPARATOR . 'init.sh';
+        file_put_contents($init, str_replace(array('{{oc_url}}','{{upload_path}}'), array($oc_url, $upload_path), file_get_contents($inittemplate)));
+
+        $dockertemplate = $this->dir_templates . DIRECTORY_SEPARATOR . $platform . DIRECTORY_SEPARATOR . 'Dockerfile';
+        $dockerfile = $dir_project. DIRECTORY_SEPARATOR . 'Dockerfile';
+        file_put_contents($dockerfile, str_replace(array('{{version}}'), array($version), file_get_contents($dockertemplate)));
+
+        `docker build -t env-opencart:$version -f $dockerfile $dir_project`;
+
+        $this->mysql->query("CREATE DATABASE `$stack_name`");
+
+        $this->stackStart($stack_name);
+    }
+
+    public function createNewProjectPhpCustomProject($params)
+    {
+        $platform = pathinfo($params['template'], PATHINFO_FILENAME);
+        $version = $params['version'];
+        $stack_name =  $params['project'] . '-' . pathinfo($params['template'], PATHINFO_FILENAME) . preg_replace("/[^0-9]/", '', $version);
+        $dir_project = $this->dir_projects . DIRECTORY_SEPARATOR . $stack_name;
+        `mkdir -m 777 -p $dir_project/www`;
+
+        $template = $this->dir_templates . DIRECTORY_SEPARATOR . $params['template'];
+        $compose = $dir_project. DIRECTORY_SEPARATOR . 'docker-compose.yml';
+        file_put_contents($compose, str_replace(array('{{stack_name}}','{{hostname}}','{{dir}}','{{platform}}', '{{version}}'), array($stack_name, $this->hostname, $this->dir, $platform, $version), file_get_contents($template)));
+
+        file_put_contents($dir_project . DIRECTORY_SEPARATOR . 'php.ini', file_get_contents($this->dir_templates . DIRECTORY_SEPARATOR . $platform . DIRECTORY_SEPARATOR . 'php.ini'));
+
+        file_put_contents($dir_project . DIRECTORY_SEPARATOR . 'www' . DIRECTORY_SEPARATOR . 'index.php', file_get_contents($this->dir_templates . DIRECTORY_SEPARATOR . $platform . DIRECTORY_SEPARATOR . 'index.php'));
+
+        $this->mysql->query("CREATE DATABASE `$stack_name`");
+
+        $this->stackStart($stack_name);
+    }
+
+
+    public function createNewProjectWordpress($params)
+    {
+        $platform = pathinfo($params['template'], PATHINFO_FILENAME);
+        $version = $params['version'];
+        $stack_name =  $params['project'] . '-' . pathinfo($params['template'], PATHINFO_FILENAME) . preg_replace("/[^0-9]/", '', $version);
+        $dir_project = $this->dir_projects . DIRECTORY_SEPARATOR . $stack_name;
+        `mkdir -m 777 -p $dir_project/www`;
+
+        $template = $this->dir_templates . DIRECTORY_SEPARATOR . $params['template'];
+        $compose = $dir_project. DIRECTORY_SEPARATOR . 'docker-compose.yml';
+        file_put_contents($compose, str_replace(array('{{stack_name}}','{{hostname}}','{{dir}}','{{platform}}', '{{version}}'), array($stack_name, $this->hostname, $this->dir, $platform, $version), file_get_contents($template)));
+
+        $this->mysql->query("CREATE DATABASE `$stack_name`");
+
+        $this->stackStart($stack_name);
+    }
+
+    public function createNewProjectJoomla($params)
+    {
+        $platform = pathinfo($params['template'], PATHINFO_FILENAME);
+        $version = $params['version'];
+        $stack_name =  $params['project'] . '-' . pathinfo($params['template'], PATHINFO_FILENAME) . preg_replace("/[^0-9]/", '', $version);
+        $dir_project = $this->dir_projects . DIRECTORY_SEPARATOR . $stack_name;
+        `mkdir -m 777 -p $dir_project/www`;
+
+        $template = $this->dir_templates . DIRECTORY_SEPARATOR . $params['template'];
+        $compose = $dir_project. DIRECTORY_SEPARATOR . 'docker-compose.yml';
+        file_put_contents($compose, str_replace(array('{{stack_name}}','{{hostname}}','{{dir}}','{{platform}}', '{{version}}'), array($stack_name, $this->hostname, $this->dir, $platform, $version), file_get_contents($template)));
+
+        $this->mysql->query("CREATE DATABASE `$stack_name`");
+
+        $this->stackStart($stack_name);
+    }
+
 
     public function stackStart($params)
     {
@@ -184,7 +322,18 @@ class Env
 
             $params['template'] = $this->getValue('template');
             $params['project'] = $this->getValue('stack_name');
-            $this->createNewProject($params);
+            $params['version'] = $this->getValue('version');
+            if ($params['template'] == 'prestashop.yml') {
+                $this->createNewProjectPrestashop($params);
+            } elseif ($params['template'] == 'opencart.yml') {
+                $this->createNewProjectOpencart($params);
+            } elseif ($params['template'] == 'wordpress.yml') {
+                $this->createNewProjectWordpress($params);
+            } elseif ($params['template'] == 'php-custom-project.yml') {
+                $this->createNewProjectPhpCustomProject($params);
+            } elseif ($params['template'] == 'joomla.yml') {
+                $this->createNewProjectJoomla($params);
+            }
             $this->redirect($this->url());
 
         } elseif ($this->isSubmit('submitStackStart')) {

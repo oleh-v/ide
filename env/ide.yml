@@ -3,26 +3,23 @@ version: "3.5"
 services:
 
   traefik:
-    image: traefik
+    image: traefik:v1.7.20
     hostname: traefik
-    command:
-      - --docker
-#      - --docker.swarmmode=true
-      - --docker.domain=docker.localhost
-      - --docker.watch=true
-      - --docker.exposedbydefault=true
-      - --docker.endpoint=unix:///var/run/docker.sock
-      - --debug=false
-      - --logLevel=ERROR
-      - --web
     ports:
-      - "80:80"
-      - "8080:8080"
-      - "443:443"
+      - target: 8080
+        published: 8080
+        mode: host
+      - target: 80
+        published: 80
+        mode: host
+      - target: 443
+        published: 443
+        mode: host
     deploy:
       replicas: 1
       restart_policy:
-        condition: any
+        condition: on-failure
+        delay: 3s
       placement:
         constraints:
           - node.role == manager
@@ -30,161 +27,16 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./traefik/traefik.toml:/traefik.toml
     networks:
-      - traefik
+      - proxy
     labels:
       - "traefik.enable=false"
       - "filebeat_enable=false"
     logging:
-      driver: "none"
+      driver: "json-file"
+      options:
+        max-size: "5M"
+        max-file: "1"
 
-
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.6.1
-    hostname: elasticsearch
-    deploy:
-      restart_policy:
-        condition: any
-        delay: 20s
-        max_attempts: 5
-        window: 120s
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints: [node.role == manager]
-      update_config:
-        delay: 5s
-      resources:
-        limits:
-          memory: 1200M
-#    ports:
-#      - '9200:9200'
-    volumes:
-      - ../../data/elk/elastic/es_data:/usr/share/elasticsearch/data
-    environment:
-      - cluster.name=docker-cluster
-      - bootstrap.memory_lock=false
-      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
-    labels:
-      - "traefik.enable=false"
-      - "filebeat_enable=false"
-    networks:
-      - ide
-    logging:
-      driver: "none"
-
-
-
-  kibana:
-    image: docker.elastic.co/kibana/kibana:6.6.1
-    hostname: kibana
-#    ports:
-#      - '5601:5601'
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: any
-      placement:
-        constraints:
-          - node.role == manager
-#    volumes:
-#      - ./elk/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
-    environment:
-      SERVER_NAME: kibana
-      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
-#      ELASTICSEARCH_URL: http://elasticsearch:9200
-    labels:
-      - "filebeat_enable=false"
-      - "traefik.enable=true"
-      - "traefik.port=5601"
-      - "traefik.docker.network=traefik_net"
-      - "traefik.backend=kibana"
-      - "traefik.frontend.rule=Host: elk.{{hostname}}"
-#      - "traefik.frontend.entryPoints=http"
-    networks:
-      - ide
-      - traefik
-    logging:
-      driver: "none"
-
-
-
-#  logstash:
-#    image: docker.elastic.co/logstash/logstash:6.6.1
-#    hostname: logstash
-##    ports:
-##      - '5044:5044'
-#    deploy:
-#      replicas: 1
-#      restart_policy:
-#        condition: on-failure
-#      placement:
-#        constraints:
-#          - node.role == manager
-#    volumes:
-#      - ./elk/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
-#    labels:
-#      - "traefik.enable=false"
-#      - "filebeat_enable=false"
-#    networks:
-#      - ide
-#    logging:
-#      driver: "none"
-
-
-  filebeat:
-    user: root
-    hostname: filebeat
-    image: docker.elastic.co/beats/filebeat:6.6.1
-    deploy:
-      mode: global
-      restart_policy:
-        condition: any
-      resources:
-        limits:
-          cpus: '0.20'
-          memory: 80M
-        reservations:
-          cpus: '0.1'
-          memory: 30M
-    volumes:
-      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
-#      - ./filebeat_data:/usr/share/filebeat/data:rw
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock
-    labels:
-      - "fluentd=ignore"
-      - "io.rancher.container.agent.role=environmentAdmin"
-      - "io.rancher.container.create_agent=true"
-      - "io.rancher.scheduler.global=true"
-      - "traefik.enable=false"
-      - "filebeat_enable=false"
-    networks:
-      - ide
-    logging:
-      driver: "none"
-
-  curator:
-    image: curator_ide
-    hostname: curator
-    deploy:
-      restart_policy:
-        condition: any
-        delay: 20s
-        max_attempts: 3
-        window: 120s
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints: [node.role == manager]
-      update_config:
-        delay: 2s
-    volumes:
-      - ./elk/curator/config.yml:/etc/curator/config.yml
-      - ./elk/curator/action.yml:/etc/curator/action.yml
-    networks:
-      - ide
-    logging:
-      driver: "none"
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -192,26 +44,26 @@ services:
     deploy:
       replicas: 1
       restart_policy:
-        condition: any
+        condition: on-failure
+        delay: 5s
       placement:
         constraints:
           - node.role == manager
-    environment:
-      - PMA_HOST=mysql
-      - PMA_USER=root
-      - PMA_PASSWORD=
-    labels:
+      labels:
       - "filebeat_enable=true"
       - "traefik.enable=true"
       - "traefik.port=80"
-      - "traefik.docker.network=traefik_net"
+      - "traefik.docker.network=net_proxy"
       - "traefik.backend=phpmyadmin"
       - "traefik.frontend.rule=Host: pma.{{hostname}}"
       - "traefik.frontend.entryPoints=http"
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: root
     networks:
-      - ide
-      - traefik
-      - mysql
+      - proxy
+      - data
     logging:
       driver: "none"
 
@@ -222,24 +74,26 @@ services:
     deploy:
       replicas: 1
       restart_policy:
-        condition: any
+        condition: on-failure
+        delay: 5s
       placement:
         constraints:
           - node.role == manager
-    labels:
-      - "filebeat_enable=false"
-      - "traefik.enable=false"
-#      - "traefik.backend=tasks_portainer"
-#      - "traefik.frontend.rule=Host: portainer.docker.masteram"
-#      - "traefik.port=9000"
-#      - "traefik.docker.network=traefik_proxy"
-#      - "traefik.frontend.entryPoints=http"
+      labels:
+        - "filebeat_enable=true"
+        - "traefik.enable=true"
+        - "traefik.port=9000"
+        - "traefik.docker.network=net_proxy"
+        - "traefik.backend=portainer"
+        - "traefik.frontend.rule=Host: portainer.{{hostname}}"
+        - "traefik.frontend.entryPoints=http"
     ports:
       - "9000:9000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ../../data/portainer:/data
     networks:
+      - proxy
       - ide
     logging:
       driver: "none"
@@ -250,22 +104,22 @@ services:
     deploy:
       replicas: 1
       restart_policy:
-        condition: any
+        condition: on-failure
+        delay: 3s
       placement:
         constraints:
           - node.role == manager
     volumes:
       - ../../data/mysql:/var/lib/mysql
     environment:
-#      - MYSQL_DATABASE=prestashop
-      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      MYSQL_ROOT_PASSWORD: root
     ports:
       - "3306:3306"
     labels:
       - "traefik.enable=false"
       - "filebeat_enable=true"
     networks:
-      - mysql
+      - data
     logging:
       driver: "json-file"
       options:
@@ -279,21 +133,22 @@ services:
     deploy:
       replicas: 1
       restart_policy:
-        condition: any
+        condition: on-failure
+        delay: 3s
       placement:
         constraints: [node.role == manager]
-    labels:
-      - "traefik.enable=true"
-      - "traefik.backend=env"
-      - "traefik.frontend.rule=Host: env.{{hostname}}"
-      - "traefik.port=80"
-      - "traefik.docker.network=traefik_net"
-      - "traefik.frontend.entryPoints=http"
-      - "stackname=env"
-      - "filebeat_enable=true"
-#    environment:
-#      - APACHE_RUN_USER=root
-#      - PHP_CFLAGS=-DBIG_SECURITY_HOLE
+      labels:
+        - "traefik.enable=true"
+        - "traefik.backend=env"
+        - "traefik.frontend.rule=Host: env.{{hostname}}"
+        - "traefik.port=80"
+        - "traefik.docker.network=net_proxy"
+        - "traefik.frontend.entryPoints=http"
+        - "stackname=env"
+        - "filebeat_enable=true"
+  #    environment:
+  #      - APACHE_RUN_USER=root
+  #      - PHP_CFLAGS=-DBIG_SECURITY_HOLE
     volumes:
       - ./php/php.ini:/usr/local/etc/php/conf.d/user.ini
       - ../../env/www:/var/www/html
@@ -302,8 +157,8 @@ services:
       - {{envpwd}}:{{envpwd}}
       - /etc/localtime:/etc/localtime:ro
     networks:
-      - traefik
-      - mysql
+      - proxy
+      - data
     logging:
       driver: "json-file"
       options:
@@ -312,9 +167,9 @@ services:
 
 networks:
   ide:
-  traefik:
+  proxy:
     external: true
-    name: traefik_net
-  mysql:
+    name: net_proxy
+  data:
     external: true
-    name: mysql_net
+    name: net_data

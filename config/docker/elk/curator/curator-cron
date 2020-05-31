@@ -1,1 +1,0 @@
-0 * * * * /usr/local/bin/curator --config /etc/curator/config.yml /etc/curator/action.yml
