@@ -21,3 +21,8 @@ sed -i "s?{{envpwd}}?$PWD?g" env/www/config.json
 find $(pwd) -type f -name "*.sh" -exec chmod +x {} \;
 
 docker stack deploy -c ./config/docker/ide.yml ide
+
+if ! grep -q "127.0.0.1 env.$HOSTNAME pma.$HOSTNAME" /etc/hosts
+then
+    echo -e "\n127.0.0.1 env.$HOSTNAME pma.$HOSTNAME" >> /etc/hosts
+fi

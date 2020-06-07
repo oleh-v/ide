@@ -49,7 +49,7 @@ $env = new Env($config);
             </ul>
         </div>
     </nav>
-    <h2>Integrated Development Environment</h2>
+    <h2><center>Integrated Development Environment</center></h2>
     <br>
     <h4>Create new project</h4>
     <form action="/index.php" method="POST">
@@ -180,9 +180,46 @@ $env = new Env($config);
             <?php $env->caseSubmit(); ?>
         </tbody>
     </table>
+
+    <div class="container">
+        <div class="card bg-light mt-4">
+            <div class="card-header">
+                <h3>
+                    Usage
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning d-flex flex-row">
+                    <div>
+                        Fill project name, select template, version and press <b>Deploy</b> button. <br>
+                        This action will deploy the docker stack, create project directory by path <code>./ide/projects/project_name/www/</code>, and create the database <br>
+                        <div class="glyphicon glyphicon-exclamation-sign"></div> Don't forget to add each project domain from <i>"Front URL"</i> to <b>hosts</b> file. <br>
+                        For Linux: <b>/etc/hosts</b> <br>
+                        For Windows: <b>C:\Windows\System32\drivers\etc\hosts</b>
+                    </div>
+                </div>
+                <div class="alert alert-warning d-flex flex-row">
+                    <div>
+                        <b>Start/Update</b> button - start/restart docker stack with existing project <code>docker stack deploy ...</code> <br>
+                        <b>Stop</b> button - remove docker stack <code>docker stack rm ...</code> But all data won't to be removed. You can start this stack later.<br>
+                        <div class="glyphicon glyphicon-exclamation-sign"></div> <b>Delete</b> button - remove docker stack and ALL DATA (database and project files). Be careful ! <br>
+                    </div>
+                </div>
+                <div class="alert alert-warning d-flex flex-row">
+                    <div>
+                        By links on top of the page you can get: <br>
+                        <b>Portainer</b> - lightweight management UI which allows you to easily manage your different Docker environments <br>
+                        <b>Traefik dashboard</b> - a modern HTTP reverse proxy and load balancer that makes deploying microservices easy <br>
+                        <b>phpMyAdmin</b> - a web interface for MySQL and MariaDB <br>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 </div>
-
-
 
 </body>
 </html>
