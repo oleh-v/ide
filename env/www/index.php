@@ -192,8 +192,8 @@ $env = new Env($config);
                 <div class="alert alert-warning d-flex flex-row">
                     <div>
                         Fill project name, select template, version and press <b>Deploy</b> button. <br>
-                        This action will deploy the docker stack, create project directory by path <code>./ide/projects/project_name/www/</code>, and create the database <br>
-                        <div class="glyphicon glyphicon-exclamation-sign"></div> Don't forget to add each project domain from <i>"Front URL"</i> to <b>hosts</b> file. <br>
+                        This action deploys the docker stack, creates project directory by path <code>./ide/projects/project_name/www/</code>, <i>(this path is mounted into container as DocumentRoot)</i>. <br> New MySQL database is automatically created as well and equals <i>"Stack Name"</i> column. User <code>root</code>, Password: <i>empty</i> <br>
+                        <div class="glyphicon glyphicon-exclamation-sign"></div> Don't forget to add each project domain from <i>"Front URL"</i> to the <b>hosts</b> file. <br>
                         For Linux: <b>/etc/hosts</b> <br>
                         For Windows: <b>C:\Windows\System32\drivers\etc\hosts</b>
                     </div>
