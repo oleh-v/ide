@@ -1,4 +1,4 @@
-# Integrated Development Environment with Docker
+# Docker IDE with GUI for web development
 
 Docker IDE with GUI saves time for setup web environment by development modules and themes for Joomla, Opencart, Prestashop, Wordpress and custom web-application as well.
 
