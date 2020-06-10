@@ -13,10 +13,10 @@ docker build -t php_ide ./config/docker/php --build-arg docker_gid=$(getent grou
 
 cp env/ide.yml config/docker/ide.yml
 sed -i "s/{{hostname}}/$HOSTNAME/g" config/docker/ide.yml
-sed -i "s?{{envpwd}}?$PWD?g" config/docker/ide.yml
+sed -i "s/{{envpwd}}/$PWD/g" config/docker/ide.yml
 
 cp env/config.json env/www/config.json
-sed -i "s?{{envpwd}}?$PWD?g" env/www/config.json
+sed -i "s/{{envpwd}}/$PWD/g" env/www/config.json
 
 find $(pwd) -type f -name "*.sh" -exec chmod +x {} \;
 
